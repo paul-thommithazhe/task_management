@@ -305,6 +305,24 @@ class _TaskListHomeScreenState extends State<TaskListHomeScreen> {
                                                     ),
                                                   ),
                                                   IconButton(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        CupertinoPageRoute(
+                                                          builder: (context) =>
+                                                              AddNewTaskScreen(
+                                                                taskToEdit:
+                                                                    task, // pass the task you want to edit
+                                                              ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.edit_note,
+                                                      color: Colors.amber,
+                                                    ),
+                                                  ),
+                                                  IconButton(
                                                     icon: const Icon(
                                                       Icons.delete,
                                                       color: Colors.red,

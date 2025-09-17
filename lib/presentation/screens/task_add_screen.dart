@@ -6,7 +6,8 @@ import 'package:task_management_app/presentation/bloc/task_event_bloc.dart';
 import 'package:uuid/uuid.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
-  const AddNewTaskScreen({super.key});
+  final Task? taskToEdit; // null if adding a new task
+  const AddNewTaskScreen({super.key, this.taskToEdit});
 
   @override
   State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
@@ -18,6 +19,15 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   DateTime? _selectedDueDate;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.taskToEdit != null) {
+      _titleController.text = widget.taskToEdit!.title;
+      _descriptionController.text = widget.taskToEdit!.description;
+      _selectedDueDate = widget.taskToEdit!.dueDate;
+    }
+  }
 
   void _pickDueDate() async {
     final now = DateTime.now();
@@ -44,40 +54,43 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         return;
       }
 
-      // Generate a unique ID
-      final String taskId = const Uuid().v4();
+      if (widget.taskToEdit != null) {
+        // Editing existing task
+        final updatedTask = Task(
+          id: widget.taskToEdit!.id,
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          dueDate: _selectedDueDate!,
+          isCompleted: widget.taskToEdit!.isCompleted,
+        );
 
-      final newTask = Task(
-        id: taskId,
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        dueDate: _selectedDueDate!,
-        isCompleted: false,
-      );
+        context.read<TaskBloc>().add(UpdateTaskEvent(updatedTask));
 
-      // Dispatch AddTaskEvent
-      context.read<TaskBloc>().add(AddTaskEvent(newTask));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'Task added successfully!',
-                style: TextStyle(color: Colors.white),
-              ),
-              Icon(Icons.check_circle, color: Colors.white),
-            ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Task updated successfully!'),
+            backgroundColor: Colors.green,
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior
-              .floating, // optional: makes it float above content
-          margin: const EdgeInsets.all(
-            16,
-          ), // optional: adds spacing around snackbar
-          duration: const Duration(seconds: 2),
-        ),
-      );
+        );
+      } else {
+        // Adding new task
+        final newTask = Task(
+          id: const Uuid().v4(),
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          dueDate: _selectedDueDate!,
+          isCompleted: false,
+        );
+
+        context.read<TaskBloc>().add(AddTaskEvent(newTask));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Task added successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
 
       Navigator.pop(context); // Return to task list
     }

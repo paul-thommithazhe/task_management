@@ -1,4 +1,3 @@
-
 import 'package:task_management_app/domain/entities/task.dart';
 
 abstract class TaskEvent {}
@@ -20,4 +19,9 @@ class UpdateTaskStatusEvent extends TaskEvent {
 class DeleteTaskEvent extends TaskEvent {
   final String taskId;
   DeleteTaskEvent({required this.taskId});
+}
+
+class UpdateTaskEvent extends TaskEvent {
+  final Task task;
+  UpdateTaskEvent(this.task);
 }

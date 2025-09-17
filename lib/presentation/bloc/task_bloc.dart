@@ -10,6 +10,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   TaskBloc(this.taskBox) : super(TaskInitial()) {
     on<LoadTasksEvent>(_onLoadTasks);
     on<AddTaskEvent>(_onAddTask);
+    on<UpdateTaskEvent>(_onUpdate);
     on<UpdateTaskStatusEvent>(_onUpdateTaskStatus);
     on<DeleteTaskEvent>(_onDeleteTask);
   }
@@ -31,6 +32,24 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       emit(TaskLoaded(tasks));
     } catch (e) {
       emit(TaskError("Failed to add task: $e"));
+    }
+  }
+
+  void _onUpdate(UpdateTaskEvent event, Emitter<TaskState> emit) async {
+    emit(TaskLoading());
+    try {
+      // Find the task in Hive by ID
+      final taskKey = taskBox.keys.firstWhere((key) {
+        final task = taskBox.get(key);
+        return task != null && task.id == event.task.id;
+      });
+
+      await taskBox.put(taskKey, TaskModel.fromEntity(event.task));
+
+      final tasks = taskBox.values.map((m) => m.toEntity()).toList();
+      emit(TaskLoaded(tasks));
+    } catch (e) {
+      emit(TaskError("Failed to update task: $e"));
     }
   }
 
