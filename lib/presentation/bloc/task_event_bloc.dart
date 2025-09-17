@@ -1,22 +1,23 @@
-import 'package:equatable/equatable.dart';
-import '../../domain/entities/task.dart';
 
-abstract class TaskEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+import 'package:task_management_app/domain/entities/task.dart';
+
+abstract class TaskEvent {}
 
 class LoadTasksEvent extends TaskEvent {}
 
 class AddTaskEvent extends TaskEvent {
   final Task task;
   AddTaskEvent(this.task);
-
-  @override
-  List<Object?> get props => [task];
 }
 
-class ToggleTaskCompletion extends TaskEvent {
-  final int taskKey; // Hive key
-  ToggleTaskCompletion(this.taskKey);
+class UpdateTaskStatusEvent extends TaskEvent {
+  final String taskId;
+  final bool isCompleted;
+
+  UpdateTaskStatusEvent({required this.taskId, required this.isCompleted});
+}
+
+class DeleteTaskEvent extends TaskEvent {
+  final String taskId;
+  DeleteTaskEvent({required this.taskId});
 }

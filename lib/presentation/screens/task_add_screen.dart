@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management_app/domain/entities/task.dart';
+import 'package:task_management_app/presentation/bloc/task_bloc.dart';
+import 'package:task_management_app/presentation/bloc/task_event_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
   const AddNewTaskScreen({super.key});
@@ -39,15 +44,40 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         return;
       }
 
-      // final newTask = Task(
-      //   id: const Uuid().v4(), // unique ID
-      //   title: _titleController.text.trim(),
-      //   description: _descriptionController.text.trim(),
-      //   dueDate: _selectedDueDate!,
-      // );
+      // Generate a unique ID
+      final String taskId = const Uuid().v4();
 
-      // Add the task via BLoC
-      // context.read<TaskBloc>().add(AddTaskEvent(newTask));
+      final newTask = Task(
+        id: taskId,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        dueDate: _selectedDueDate!,
+        isCompleted: false,
+      );
+
+      // Dispatch AddTaskEvent
+      context.read<TaskBloc>().add(AddTaskEvent(newTask));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                'Task added successfully!',
+                style: TextStyle(color: Colors.white),
+              ),
+              Icon(Icons.check_circle, color: Colors.white),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior
+              .floating, // optional: makes it float above content
+          margin: const EdgeInsets.all(
+            16,
+          ), // optional: adds spacing around snackbar
+          duration: const Duration(seconds: 2),
+        ),
+      );
 
       Navigator.pop(context); // Return to task list
     }
@@ -56,7 +86,13 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add New Task'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(
+          'ADD NEW',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -68,6 +104,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                 controller: _titleController,
                 decoration: const InputDecoration(
                   labelText: 'Task Title',
+                  labelStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) =>
@@ -80,6 +117,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                 controller: _descriptionController,
                 decoration: const InputDecoration(
                   labelText: 'Description',
+                  labelStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -95,8 +133,9 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                   _selectedDueDate == null
                       ? 'Select Due Date'
                       : 'Due: ${_selectedDueDate!.day}-${_selectedDueDate!.month}-${_selectedDueDate!.year}',
+                  style: TextStyle(color: Colors.white),
                 ),
-                trailing: const Icon(Icons.calendar_today),
+                trailing: const Icon(Icons.calendar_today, color: Colors.white),
                 onTap: _pickDueDate,
               ),
               const SizedBox(height: 24),
@@ -104,6 +143,18 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
               // Save Button
               ElevatedButton(
                 onPressed: _saveTask,
+
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF4EBADE),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
                 child: const Text('Save Task'),
               ),
             ],

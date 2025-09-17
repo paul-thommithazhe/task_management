@@ -6,18 +6,22 @@ part 'task_models.g.dart';
 @HiveType(typeId: 0)
 class TaskModel extends HiveObject {
   @HiveField(0)
-  String title;
+  String id;
 
   @HiveField(1)
-  String description;
+  String title;
 
   @HiveField(2)
-  DateTime dueDate;
+  String description;
 
   @HiveField(3)
+  DateTime dueDate;
+
+  @HiveField(4)
   bool isCompleted;
 
   TaskModel({
+    required this.id,
     required this.title,
     required this.description,
     required this.dueDate,
@@ -26,6 +30,7 @@ class TaskModel extends HiveObject {
 
   // Convert Entity -> Model
   factory TaskModel.fromEntity(Task task) => TaskModel(
+    id: task.id,
     title: task.title,
     description: task.description,
     dueDate: task.dueDate,
@@ -34,6 +39,7 @@ class TaskModel extends HiveObject {
 
   // Convert Model -> Entity
   Task toEntity() => Task(
+    id: id,
     title: title,
     description: description,
     dueDate: dueDate,
@@ -48,6 +54,7 @@ class TaskModel extends HiveObject {
     bool? isCompleted,
   }) {
     return TaskModel(
+      id: id ,
       title: title ?? this.title,
       description: description ?? this.description,
       dueDate: dueDate ?? this.dueDate,

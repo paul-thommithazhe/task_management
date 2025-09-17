@@ -15,10 +15,8 @@ void main() async {
   // register the adapter
   Hive.registerAdapter(TaskModelAdapter());
 
-  // open the box
-  await Hive.openBox<TaskModel>('tasks');
-  // open the box
-  final taskBox = await Hive.openBox<TaskModel>('tasks');
+  // open the box ONCE
+  final taskBox = await Hive.openBox<TaskModel>('tasks4');
 
   runApp(MyApp(taskBox: taskBox));
 }
